@@ -31,6 +31,15 @@ class Rotor {
             return Utility.getShiftedLetter(letter, this._ringSetting - 1);
         });
     }
+
+    encipher(letter) {
+        const idx = Utility.getCharacterCode(letter);
+        const rotorPosIdx = Utility.getCharacterCode(this._position);
+        // the final mapping index is the current letter position plus the shifted rotor position
+        const mappingIdx = Utility.getModulo(idx + rotorPosIdx, 26);
+        
+        return this._mapping[mappingIdx];
+    }
 }
 
 export default Rotor;
