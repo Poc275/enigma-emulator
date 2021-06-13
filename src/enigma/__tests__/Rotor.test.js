@@ -64,7 +64,7 @@ test("applyRingSetting modifies the rotor mapping correctly when set to 26", () 
     );
 });
 
-test("stepRotor modifies the start position property", () => {
+test("stepRotor modifies the position property", () => {
     const rotor = new Rotor(rotorIMapping, "A", 1);
     rotor.stepRotor();
     expect(rotor._position).toEqual("B");
@@ -142,9 +142,51 @@ ${"Z"} | ${"P"}   | ${26}       | ${"G"}
 ${"A"} | ${"Z"}   | ${26}       | ${"D"}
 ${"V"} | ${"Z"}   | ${26}       | ${"H"}
 ${"Z"} | ${"Z"}   | ${26}       | ${"I"}
-`("encipher returns $expected when input is $input with a position of $position and a ring setting of $ringSetting", ({input, position, ringSetting, expected}) => {
+`("encipher returns $expected when input is $input with a position of $position and a ring setting of $ringSetting in the forwards direction", ({input, position, ringSetting, expected}) => {
     const rotor = new Rotor(rotorIMapping, position, ringSetting);
     rotor.applyRingSetting();
-    const result = rotor.encipher(input)
+    const result = rotor.encipher(input, true)
+    expect(result).toEqual(expected);
+});
+
+test.each`
+input  | position | ringSetting | expected
+${"A"} | ${"A"}   | ${1}        | ${"U"}
+${"P"} | ${"A"}   | ${1}        | ${"T"}
+${"Z"} | ${"A"}   | ${1}        | ${"J"}
+${"A"} | ${"B"}   | ${1}        | ${"W"}
+${"C"} | ${"B"}   | ${1}        | ${"G"}
+${"Z"} | ${"B"}   | ${1}        | ${"U"}
+${"A"} | ${"N"}   | ${1}        | ${"K"}
+${"Q"} | ${"N"}   | ${1}        | ${"G"}
+${"Z"} | ${"N"}   | ${1}        | ${"C"}
+${"A"} | ${"Z"}   | ${1}        | ${"J"}
+${"I"} | ${"Z"}   | ${1}        | ${"P"}
+${"Z"} | ${"Z"}   | ${1}        | ${"O"}
+${"A"} | ${"A"}   | ${2}        | ${"K"}
+${"W"} | ${"A"}   | ${2}        | ${"J"}
+${"Z"} | ${"A"}   | ${2}        | ${"P"}
+${"A"} | ${"B"}   | ${2}        | ${"V"}
+${"J"} | ${"B"}   | ${2}        | ${"A"}
+${"Z"} | ${"B"}   | ${2}        | ${"K"}
+${"A"} | ${"M"}   | ${3}        | ${"D"}
+${"F"} | ${"M"}   | ${3}        | ${"V"}
+${"Z"} | ${"M"}   | ${3}        | ${"B"}
+${"A"} | ${"S"}   | ${6}        | ${"P"}
+${"S"} | ${"S"}   | ${6}        | ${"I"}
+${"Z"} | ${"S"}   | ${6}        | ${"H"}
+${"A"} | ${"V"}   | ${10}       | ${"L"}
+${"G"} | ${"V"}   | ${10}       | ${"B"}
+${"Z"} | ${"V"}   | ${10}       | ${"N"}
+${"A"} | ${"Y"}   | ${15}       | ${"P"}
+${"E"} | ${"Y"}   | ${15}       | ${"A"}
+${"Z"} | ${"Y"}   | ${15}       | ${"N"}
+${"A"} | ${"Z"}   | ${26}       | ${"T"}
+${"K"} | ${"Z"}   | ${26}       | ${"A"}
+${"Z"} | ${"Z"}   | ${26}       | ${"I"}
+`("encipher returns $expected when input is $input with a position of $position and a ring setting of $ringSetting in the backwards direction", ({input, position, ringSetting, expected}) => {
+    const rotor = new Rotor(rotorIMapping, position, ringSetting);
+    rotor.applyRingSetting();
+    const result = rotor.encipher(input, false)
     expect(result).toEqual(expected);
 });

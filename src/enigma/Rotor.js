@@ -32,13 +32,22 @@ class Rotor {
         });
     }
 
-    encipher(letter) {
+    encipher(letter, forwards) {
+        // get input letter to rotor which is the alphabet index of the letter plus the rotor's current position
         const idx = Utility.getCharacterCode(letter);
         const rotorPosIdx = Utility.getCharacterCode(this._position);
-        // the final mapping index is the current letter position plus the shifted rotor position
         const mappingIdx = Utility.getModulo(idx + rotorPosIdx, 26);
-        
-        return this._mapping[mappingIdx];
+
+        if(forwards) {           
+            return this._mapping[mappingIdx];
+
+        } else if(!forwards) {
+            // for backwards mapping we must get the index of the input letter from the mapping (+65 as A is ASCII code 65)
+            const inputLetter = Utility.getCharacterFromCode(mappingIdx + 65);
+            const inputLetterIdx = this._mapping.findIndex(el => el === inputLetter);
+
+            return Utility.getCharacterFromCode(inputLetterIdx + 65);
+        }
     }
 }
 
