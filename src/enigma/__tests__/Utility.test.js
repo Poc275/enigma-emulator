@@ -10,7 +10,7 @@ ${"V"} | ${21}
 ${"Z"} | ${25}
 `("getCharacterCode returns $expected when letter is $letter", ({letter, expected}) => {
     const letterPos = Utility.getCharacterCode(letter);
-    expect(letterPos).toBe(expected);
+    expect(letterPos).toEqual(expected);
 });
 
 test.each`
@@ -23,7 +23,7 @@ ${83}  | ${"S"}
 ${88}  | ${"X"}
 `("getCharacterFromCode returns $expected when character code is $code", ({code, expected}) => {
     const character = Utility.getCharacterFromCode(code);
-    expect(character).toBe(expected);
+    expect(character).toEqual(expected);
 });
 
 test.each`
@@ -35,7 +35,7 @@ ${25} | ${26}   | ${25}
 ${26} | ${26}   | ${0}
 `("getModulo returns $expected when value is $value with modulus $modulus", ({value, modulus, expected}) => {
     const modulo = Utility.getModulo(value, modulus);
-    expect(modulo).toBe(expected);
+    expect(modulo).toEqual(expected);
 });
 
 test.each`
@@ -48,5 +48,5 @@ ${"I"} | ${5}  | ${"N"}
 ${"W"} | ${5}  | ${"B"}
 `("getShiftedLetter returns $expected when input letter is $letter with a shift of $shift", ({letter, shift, expected}) => {
     const shiftedLetter = Utility.getShiftedLetter(letter, shift);
-    expect(shiftedLetter).toBe(expected);
+    expect(shiftedLetter).toEqual(expected);
 });

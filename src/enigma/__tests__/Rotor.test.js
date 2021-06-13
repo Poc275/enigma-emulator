@@ -10,7 +10,7 @@ test("instance is correct", () => {
 test("fields are set correctly", () => {
     const rotor = new Rotor(rotorIMapping, "A", 1);
     expect(rotor._mapping).toEqual(rotorIMapping);
-    expect(rotor._startPosition).toBe("A");
+    expect(rotor._position).toBe("A");
     expect(rotor._ringSetting).toBe(1);
 });
 
@@ -62,4 +62,23 @@ test("applyRingSetting modifies the rotor mapping correctly when set to 26", () 
     expect(rotorWithRingSetting._mapping).toEqual(
         ["J", "L", "E", "K", "F", "C", "P", "U", "Y", "M", "S", "N", "V", "X", "G", "W", "T", "R", "O", "Z", "H", "A", "Q", "B", "I", "D"]
     );
+});
+
+test("stepRotor modifies the start position property", () => {
+    const rotor = new Rotor(rotorIMapping, "A", 1);
+    rotor.stepRotor();
+    expect(rotor._position).toEqual("B");
+});
+
+test.each`
+position | expected
+${"A"}   | ${"B"}
+${"N"}   | ${"O"}
+${"T"}   | ${"U"}
+${"Y"}   | ${"Z"}
+${"Z"}   | ${"A"}
+`("stepRotor returns $expected when position is $position", ({position, expected}) => {
+    const rotor = new Rotor(rotorIMapping, position, 1);
+    rotor.stepRotor();
+    expect(rotor._position).toEqual(expected);
 });

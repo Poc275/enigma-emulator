@@ -4,8 +4,12 @@ class Rotor {
 
     constructor(mapping, startPosition, ringSetting) {
         this._mapping = [...mapping];
-        this._startPosition = startPosition;
+        this._position = startPosition;
         this._ringSetting = ringSetting;
+    }
+
+    stepRotor() {
+        this._position = Utility.getShiftedLetter(this._position, 1);
     }
 
     applyRingSetting() {
