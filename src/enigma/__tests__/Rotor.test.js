@@ -3,71 +3,72 @@ import Rotor from "../Rotor";
 const rotorIMapping = ["E", "K", "M", "F", "L", "G", "D", "Q", "V", "Z", "N", "T", "O", "W", "Y", "H", "X", "U", "S", "P", "A", "I", "B", "R", "C", "J"];
 
 test("instance is correct", () => {
-    const rotor = new Rotor(rotorIMapping, "A", 1);
+    const rotor = new Rotor(rotorIMapping, "A", 1, "R");
     expect(rotor).toBeInstanceOf(Rotor);
 });
 
 test("fields are set correctly", () => {
-    const rotor = new Rotor(rotorIMapping, "A", 1);
-    expect(rotor._mapping).toEqual(rotorIMapping);
-    expect(rotor._position).toBe("A");
-    expect(rotor._ringSetting).toBe(1);
+    const rotor = new Rotor(rotorIMapping, "A", 1, "R");
+    expect(rotor.mapping).toEqual(rotorIMapping);
+    expect(rotor.position).toBe("A");
+    expect(rotor.ringSetting).toBe(1);
+    expect(rotor.stepPoint).toBe("R");
 });
 
 test("applyRingSetting returns the same number of mapping elements", () => {
-    const rotor = new Rotor(rotorIMapping, "A", 1);
+    const rotor = new Rotor(rotorIMapping, "A", 1, "R");
     rotor.applyRingSetting();
-    expect(rotor._mapping.length).toEqual(26);
+    expect(rotor.mapping.length).toEqual(26);
 });
 
 test("applyRingSetting returns the same number of mapping elements when a shift is applied", () => {
-    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 20);
+    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 20, "R");
     rotorWithRingSetting.applyRingSetting();
-    expect(rotorWithRingSetting._mapping.length).toEqual(26);
+    expect(rotorWithRingSetting.mapping.length).toEqual(26);
 });
 
 test("applyRingSetting does not modify the rotor mapping when set to 1", () => {
-    const rotor = new Rotor(rotorIMapping, "A", 1);
+    const rotor = new Rotor(rotorIMapping, "A", 1, "R");
     rotor.applyRingSetting();
-    expect(rotor._mapping).toEqual(rotorIMapping);
+    expect(rotor.mapping).toEqual(rotorIMapping);
 });
 
 test("applyRingSetting modifies the rotor mapping correctly when set to 2", () => {
-    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 2);
+    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 2, "R");
     rotorWithRingSetting.applyRingSetting();
-    expect(rotorWithRingSetting._mapping).toEqual(
+    expect(rotorWithRingSetting.mapping).toEqual(
         ["K", "F", "L", "N", "G", "M", "H", "E", "R", "W", "A", "O", "U", "P", "X", "Z", "I", "Y", "V", "T", "Q", "B", "J", "C", "S", "D"]
     );
 });
 
 test("applyRingSetting modifies the rotor mapping correctly when set to 3", () => {
-    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 3);
+    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 3, "R");
     rotorWithRingSetting.applyRingSetting();
-    expect(rotorWithRingSetting._mapping).toEqual(
+    expect(rotorWithRingSetting.mapping).toEqual(
         ["E", "L", "G", "M", "O", "H", "N", "I", "F", "S", "X", "B", "P", "V", "Q", "Y", "A", "J", "Z", "W", "U", "R", "C", "K", "D", "T"]
     );
 });
 
 test("applyRingSetting modifies the rotor mapping correctly when set to 6", () => {
-    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 6);
+    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 6, "R");
     rotorWithRingSetting.applyRingSetting();
-    expect(rotorWithRingSetting._mapping).toEqual(
+    expect(rotorWithRingSetting.mapping).toEqual(
         ["N", "G", "W", "H", "O", "J", "P", "R", "K", "Q", "L", "I", "V", "A", "E", "S", "Y", "T", "B", "D", "M", "C", "Z", "X", "U", "F"]
     );
 });
 
 test("applyRingSetting modifies the rotor mapping correctly when set to 26", () => {
-    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 26);
+    const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 26, "R");
     rotorWithRingSetting.applyRingSetting();
-    expect(rotorWithRingSetting._mapping).toEqual(
+    expect(rotorWithRingSetting.mapping).toEqual(
         ["J", "L", "E", "K", "F", "C", "P", "U", "Y", "M", "S", "N", "V", "X", "G", "W", "T", "R", "O", "Z", "H", "A", "Q", "B", "I", "D"]
     );
 });
 
 test("stepRotor modifies the position property", () => {
-    const rotor = new Rotor(rotorIMapping, "A", 1);
+    const rotor = new Rotor(rotorIMapping, "A", 1, "R");
     rotor.stepRotor();
-    expect(rotor._position).toEqual("B");
+    expect(rotor.position).toEqual("B");
 });
 
 test.each`
@@ -78,9 +79,9 @@ ${"T"}   | ${"U"}
 ${"Y"}   | ${"Z"}
 ${"Z"}   | ${"A"}
 `("stepRotor returns $expected when position is $position", ({position, expected}) => {
-    const rotor = new Rotor(rotorIMapping, position, 1);
+    const rotor = new Rotor(rotorIMapping, position, 1, "R");
     rotor.stepRotor();
-    expect(rotor._position).toEqual(expected);
+    expect(rotor.position).toEqual(expected);
 });
 
 test.each`
@@ -143,7 +144,7 @@ ${"A"} | ${"Z"}   | ${26}       | ${"D"}
 ${"V"} | ${"Z"}   | ${26}       | ${"H"}
 ${"Z"} | ${"Z"}   | ${26}       | ${"I"}
 `("encipher returns $expected when input is $input with a position of $position and a ring setting of $ringSetting in the forwards direction", ({input, position, ringSetting, expected}) => {
-    const rotor = new Rotor(rotorIMapping, position, ringSetting);
+    const rotor = new Rotor(rotorIMapping, position, ringSetting, "R");
     rotor.applyRingSetting();
     const result = rotor.encipher(input, true)
     expect(result).toEqual(expected);
@@ -185,7 +186,7 @@ ${"A"} | ${"Z"}   | ${26}       | ${"T"}
 ${"K"} | ${"Z"}   | ${26}       | ${"A"}
 ${"Z"} | ${"Z"}   | ${26}       | ${"I"}
 `("encipher returns $expected when input is $input with a position of $position and a ring setting of $ringSetting in the backwards direction", ({input, position, ringSetting, expected}) => {
-    const rotor = new Rotor(rotorIMapping, position, ringSetting);
+    const rotor = new Rotor(rotorIMapping, position, ringSetting, "R");
     rotor.applyRingSetting();
     const result = rotor.encipher(input, false)
     expect(result).toEqual(expected);

@@ -2,10 +2,27 @@ import Utility from "./Utility";
 
 class Rotor {
 
-    constructor(mapping, startPosition, ringSetting) {
+    constructor(mapping, startPosition, ringSetting, stepPoint) {
         this._mapping = [...mapping];
         this._position = startPosition;
         this._ringSetting = ringSetting;
+        this._stepPoint = stepPoint;
+    }
+
+    get mapping() {
+        return this._mapping;
+    }
+
+    get position() {
+        return this._position;
+    }
+
+    get ringSetting() {
+        return this._ringSetting;
+    }
+
+    get stepPoint() {
+        return this._stepPoint;
     }
 
     stepRotor() {
