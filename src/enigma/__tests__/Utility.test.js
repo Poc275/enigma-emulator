@@ -46,6 +46,8 @@ ${"C"} | ${2}  | ${"E"}
 ${"Y"} | ${2}  | ${"A"}
 ${"I"} | ${5}  | ${"N"}
 ${"W"} | ${5}  | ${"B"}
+${"A"} | ${-1} | ${"Z"}
+${"W"} | ${-1} | ${"V"}
 `("getShiftedLetter returns $expected when input letter is $letter with a shift of $shift", ({letter, shift, expected}) => {
     const shiftedLetter = Utility.getShiftedLetter(letter, shift);
     expect(shiftedLetter).toEqual(expected);
