@@ -120,8 +120,6 @@ class Enigma {
         // entry rotor (ETW)
         const etwOut = this.entryRotor.getEntryRotorOutput(rhsBwdOut);
 
-        // console.log(rhsBwdOut, " -> ", etwOut);
-
         return etwOut;
     }
 }
