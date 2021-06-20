@@ -106,42 +106,123 @@ test("encipher steps the rhs rotor after every letter", () => {
     // the other 2 rotors should not have stepped
     expect(enigma.middleRotor.position).toEqual("A");
     expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
 });
 
 test("encipher steps the middle rotor at the correct position", () => {
     const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
     const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, "W");
+    const rotorIII = new Rotor(rotorIIIMapping, "U", 1, "W");
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector());
-    // lhs should step the middle rotor at position W, i.e. 22nd step
-    for(let i = 0; i < 22; i++) {
-        enigma.encipher("A");
-    }
-
-    // rhs rotor should have stepped 22 times which leaves it at position W
-    expect(enigma.rhsRotor.position).toEqual("W");
-    // the middle rotor should have stepped once
-    expect(enigma.middleRotor.position).toEqual("B");
-    // the lhs rotor should not have stepped
+    
+    enigma.encipher("A");
+    // rhs rotor should have stepped once
+    expect(enigma.rhsRotor.position).toEqual("V");
+    expect(enigma.middleRotor.position).toEqual("A");
     expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // now the rhs rotor reaches its step point the middle rotor should step as well
+    expect(enigma.rhsRotor.position).toEqual("W");
+    expect(enigma.middleRotor.position).toEqual("B");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // the next step only moves the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("X");
+    expect(enigma.middleRotor.position).toEqual("B");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
 });
 
-test("encipher steps the lhs rotor at the correct position", () => {
+test("encipher double steps the rotors after 3 key presses with rotor configuration R1-R2-R3 and start positions A-D-U", () => {
     const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, "W");
+    const rotorII = new Rotor(rotorIIMapping, "D", 1, "F");
+    const rotorIII = new Rotor(rotorIIIMapping, "U", 1, "W");
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector());
-    // rhs rotor has to go through 5 complete revolutions to get the middle rotor to position 
-    // F where it will step the lhs rotor i.e. 5 * 26 (-4 as it steps at position W) = 126
-    for(let i = 0; i < 126; i++) {
-        enigma.encipher("A");
-    }
 
+    enigma.encipher("A");
+    // rhs rotor should have stepped once
+    expect(enigma.rhsRotor.position).toEqual("V");
+    expect(enigma.middleRotor.position).toEqual("D");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // now the rhs rotor reaches its step point the middle rotor should step as well
     expect(enigma.rhsRotor.position).toEqual("W");
-    // the middle rotor should have stepped five times
+    expect(enigma.middleRotor.position).toEqual("E");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    // because the middle rotor has moved into its step position (i.e. the next move will step it to F), 
+    // the next key press will be a double step
+    expect(enigma.doubleStep).toBeTruthy();
+
+    enigma.encipher("A");
+    // double step
+    expect(enigma.rhsRotor.position).toEqual("X");
     expect(enigma.middleRotor.position).toEqual("F");
-    // the lhs rotor should have stepped once
     expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // the next step only moves the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("Y");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+});
+
+test("encipher double steps the rotors after 4 key presses with rotor configuration R3-R2-R1 and start positions K-D-O", () => {
+    const rotorI = new Rotor(rotorIMapping, "O", 1, "R");
+    const rotorII = new Rotor(rotorIIMapping, "D", 1, "F");
+    const rotorIII = new Rotor(rotorIIIMapping, "K", 1, "W");
+    const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorI, rotorII, rotorIII, new Reflector());
+
+    enigma.encipher("A");
+    // rhs rotor should have stepped once
+    expect(enigma.rhsRotor.position).toEqual("P");
+    expect(enigma.middleRotor.position).toEqual("D");
+    expect(enigma.lhsRotor.position).toEqual("K");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // rhs rotor should have stepped once more
+    expect(enigma.rhsRotor.position).toEqual("Q");
+    expect(enigma.middleRotor.position).toEqual("D");
+    expect(enigma.lhsRotor.position).toEqual("K");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // rhs rotor now steps the middle rotor
+    // because the middle rotor has moved into its step position (i.e. the next move will step it to F), 
+    // the next key press will be a double step
+    expect(enigma.rhsRotor.position).toEqual("R");
+    expect(enigma.middleRotor.position).toEqual("E");
+    expect(enigma.lhsRotor.position).toEqual("K");
+    expect(enigma.doubleStep).toBeTruthy();
+
+    enigma.encipher("A");
+    // double step
+    expect(enigma.rhsRotor.position).toEqual("S");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("L");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // the next step only moves the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("T");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("L");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // the next step only moves the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("U");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("L");
+    expect(enigma.doubleStep).toBeFalsy();
 });
 
 test("encipher returns correct letter with enigma set to base configuration", () => {

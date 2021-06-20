@@ -9,6 +9,7 @@ class Enigma {
         this._mRotor = mRotor;
         this._lhsRotor = lhsRotor;
         this._reflector = reflector;
+        this._doubleStep = false;
         this.calculateRelativeOffsets();
     }
 
@@ -40,6 +41,13 @@ class Enigma {
         return this._relativeOffsets;
     }
 
+    get doubleStep() {
+        return this._doubleStep;
+    }
+    set doubleStep(val) {
+        this._doubleStep = val;
+    }
+
     calculateRelativeOffsets() {
         // forwards offsets
         // Input to the RHS rotor comes from the entry rotor (ETW) which doesn't move so is always in the 'A' position
@@ -59,17 +67,37 @@ class Enigma {
 
     encipher(letter) {
         // advance rotors once an enigma key is pressed BEFORE enciphering any letters
+        // the rhs rotor always steps after every keypress
         this.rhsRotor.stepRotor();
+
+        // double step check
+        if(this.doubleStep) {
+            this.middleRotor.stepRotor();
+            this.doubleStep = false;
+
+            // middle rotor has stepped, check if the lhs rotor is to be stepped
+            if(this.middleRotor.position === this.middleRotor.stepPoint) {
+                // middle rotor has reached its turnover point, advance the lhs rotor
+                this.lhsRotor.stepRotor();
+            }
+        }
 
         // check if the adjacent rotors are stepped
         if(this.rhsRotor.position === this.rhsRotor.stepPoint) {
             // rhs rotor has reached its turnover point, advance the middle rotor
             this.middleRotor.stepRotor();
-        }
 
-        if(this.middleRotor.position === this.middleRotor.stepPoint) {
-            // middle rotor has reached its turnover point, advance the lhs rotor
-            this.lhsRotor.stepRotor();
+            // middle rotor has stepped, check if the lhs rotor is to be stepped
+            if(this.middleRotor.position === this.middleRotor.stepPoint) {
+                this.lhsRotor.stepRotor();
+            }
+
+            // if the middle rotor has moved into its notch position then on the 
+            // next keypress the lhs rotor will be moved which will also move the 
+            // middle rotor i.e. a double step
+            if(this.middleRotor.position === Utility.getShiftedLetter(this.middleRotor.stepPoint, -1)) {
+                this.doubleStep = true;
+            }
         }
 
         // update rotor relative offset positions once they have stepped
