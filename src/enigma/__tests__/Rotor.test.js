@@ -1,4 +1,5 @@
 import Rotor from "../Rotor";
+import Utility from "../Utility";
 
 const rotorIMapping = ["E", "K", "M", "F", "L", "G", "D", "Q", "V", "Z", "N", "T", "O", "W", "Y", "H", "X", "U", "S", "P", "A", "I", "B", "R", "C", "J"];
 
@@ -10,32 +11,42 @@ test("instance is correct", () => {
 test("fields are set correctly", () => {
     const rotor = new Rotor(rotorIMapping, "A", 1, "R");
     expect(rotor.mapping).toEqual(rotorIMapping);
-    expect(rotor.position).toBe("A");
-    expect(rotor.ringSetting).toBe(1);
-    expect(rotor.stepPoint).toBe("R");
+    expect(rotor.position).toEqual("A");
+    expect(rotor.ringSetting).toEqual(1);
+    expect(rotor.stepPoint).toEqual("R");
+    expect(rotor.forwardsRelativeOffset).toEqual(0);
+    expect(rotor.backwardsRelativeOffset).toEqual(0);
+});
+
+test("relative offsets setters set the correct values", () => {
+    const rotor = new Rotor(rotorIMapping, "A", 1, "R");
+    expect(rotor.forwardsRelativeOffset).toEqual(0);
+    expect(rotor.backwardsRelativeOffset).toEqual(0);
+
+    rotor.forwardsRelativeOffset = 14;
+    rotor.backwardsRelativeOffset = 2;
+
+    expect(rotor.forwardsRelativeOffset).toEqual(14);
+    expect(rotor.backwardsRelativeOffset).toEqual(2);
 });
 
 test("applyRingSetting returns the same number of mapping elements", () => {
     const rotor = new Rotor(rotorIMapping, "A", 1, "R");
-    rotor.applyRingSetting();
     expect(rotor.mapping.length).toEqual(26);
 });
 
 test("applyRingSetting returns the same number of mapping elements when a shift is applied", () => {
     const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 20, "R");
-    rotorWithRingSetting.applyRingSetting();
     expect(rotorWithRingSetting.mapping.length).toEqual(26);
 });
 
 test("applyRingSetting does not modify the rotor mapping when set to 1", () => {
     const rotor = new Rotor(rotorIMapping, "A", 1, "R");
-    rotor.applyRingSetting();
     expect(rotor.mapping).toEqual(rotorIMapping);
 });
 
 test("applyRingSetting modifies the rotor mapping correctly when set to 2", () => {
     const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 2, "R");
-    rotorWithRingSetting.applyRingSetting();
     expect(rotorWithRingSetting.mapping).toEqual(
         ["K", "F", "L", "N", "G", "M", "H", "E", "R", "W", "A", "O", "U", "P", "X", "Z", "I", "Y", "V", "T", "Q", "B", "J", "C", "S", "D"]
     );
@@ -43,7 +54,6 @@ test("applyRingSetting modifies the rotor mapping correctly when set to 2", () =
 
 test("applyRingSetting modifies the rotor mapping correctly when set to 3", () => {
     const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 3, "R");
-    rotorWithRingSetting.applyRingSetting();
     expect(rotorWithRingSetting.mapping).toEqual(
         ["E", "L", "G", "M", "O", "H", "N", "I", "F", "S", "X", "B", "P", "V", "Q", "Y", "A", "J", "Z", "W", "U", "R", "C", "K", "D", "T"]
     );
@@ -51,7 +61,6 @@ test("applyRingSetting modifies the rotor mapping correctly when set to 3", () =
 
 test("applyRingSetting modifies the rotor mapping correctly when set to 6", () => {
     const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 6, "R");
-    rotorWithRingSetting.applyRingSetting();
     expect(rotorWithRingSetting.mapping).toEqual(
         ["N", "G", "W", "H", "O", "J", "P", "R", "K", "Q", "L", "I", "V", "A", "E", "S", "Y", "T", "B", "D", "M", "C", "Z", "X", "U", "F"]
     );
@@ -59,7 +68,6 @@ test("applyRingSetting modifies the rotor mapping correctly when set to 6", () =
 
 test("applyRingSetting modifies the rotor mapping correctly when set to 26", () => {
     const rotorWithRingSetting = new Rotor(rotorIMapping, "A", 26, "R");
-    rotorWithRingSetting.applyRingSetting();
     expect(rotorWithRingSetting.mapping).toEqual(
         ["J", "L", "E", "K", "F", "C", "P", "U", "Y", "M", "S", "N", "V", "X", "G", "W", "T", "R", "O", "Z", "H", "A", "Q", "B", "I", "D"]
     );
@@ -145,7 +153,9 @@ ${"V"} | ${"Z"}   | ${26}       | ${"H"}
 ${"Z"} | ${"Z"}   | ${26}       | ${"I"}
 `("encipher returns $expected when input is $input with a position of $position and a ring setting of $ringSetting in the forwards direction", ({input, position, ringSetting, expected}) => {
     const rotor = new Rotor(rotorIMapping, position, ringSetting, "R");
-    rotor.applyRingSetting();
+    // apply the relative offset to be the rotor position as we're not testing the relative offset in these tests
+    rotor.forwardsRelativeOffset = Utility.getCharacterCode(position);
+    
     const result = rotor.encipher(input, true)
     expect(result).toEqual(expected);
 });
@@ -187,7 +197,40 @@ ${"K"} | ${"Z"}   | ${26}       | ${"A"}
 ${"Z"} | ${"Z"}   | ${26}       | ${"I"}
 `("encipher returns $expected when input is $input with a position of $position and a ring setting of $ringSetting in the backwards direction", ({input, position, ringSetting, expected}) => {
     const rotor = new Rotor(rotorIMapping, position, ringSetting, "R");
-    rotor.applyRingSetting();
+    // apply the relative offset to be the rotor position as we're not testing the relative offset in these tests
+    rotor.backwardsRelativeOffset = Utility.getCharacterCode(position);
+    
+    const result = rotor.encipher(input, false)
+    expect(result).toEqual(expected);
+});
+
+test.each`
+input  | position | ringSetting | relativeOffset | expected
+${"A"} | ${"B"}   | ${1}        | ${1}           | ${"K"}
+${"A"} | ${"F"}   | ${1}        | ${5}           | ${"G"}
+${"A"} | ${"W"}   | ${1}        | ${22}          | ${"B"}
+${"A"} | ${"W"}   | ${2}        | ${22}          | ${"J"}
+${"O"} | ${"B"}   | ${1}        | ${24}          | ${"O"}
+${"O"} | ${"B"}   | ${6}        | ${24}          | ${"V"}
+`("encipher returns $expected when input is $input with a position of $position, a ring setting of $ringSetting and a relative offset of $relativeOffset in the forwards direction", ({input, position, ringSetting, relativeOffset, expected}) => {
+    const rotor = new Rotor(rotorIMapping, position, ringSetting, "R");
+    rotor.forwardsRelativeOffset = relativeOffset;
+    
+    const result = rotor.encipher(input, true)
+    expect(result).toEqual(expected);
+});
+
+test.each`
+input  | position | ringSetting | relativeOffset | expected
+${"A"} | ${"A"}   | ${1}        | ${0}           | ${"U"}
+${"A"} | ${"Z"}   | ${1}        | ${25}          | ${"J"}
+${"A"} | ${"B"}   | ${1}        | ${1}           | ${"W"}
+${"C"} | ${"B"}   | ${1}        | ${1}           | ${"G"}
+${"C"} | ${"B"}   | ${6}        | ${1}           | ${"T"}
+`("encipher returns $expected when input is $input with a position of $position, a ring setting of $ringSetting and a relative offset of $relativeOffset in the backwards direction", ({input, position, ringSetting, relativeOffset, expected}) => {
+    const rotor = new Rotor(rotorIMapping, position, ringSetting, "R");
+    rotor.backwardsRelativeOffset = relativeOffset;
+    
     const result = rotor.encipher(input, false)
     expect(result).toEqual(expected);
 });

@@ -5,8 +5,11 @@ class Rotor {
     constructor(mapping, startPosition, ringSetting, stepPoint) {
         this._mapping = [...mapping];
         this._position = startPosition;
+        this._fwdRelativeOffset = 0;
+        this._bwdRelativeOffset = 0;
         this._ringSetting = ringSetting;
         this._stepPoint = stepPoint;
+        this.applyRingSetting();
     }
 
     get mapping() {
@@ -23,6 +26,22 @@ class Rotor {
 
     get stepPoint() {
         return this._stepPoint;
+    }
+
+    get forwardsRelativeOffset() {
+        return this._fwdRelativeOffset;
+    }
+
+    set forwardsRelativeOffset(offset) {
+        this._fwdRelativeOffset = offset;
+    }
+
+    get backwardsRelativeOffset() {
+        return this._bwdRelativeOffset;
+    }
+
+    set backwardsRelativeOffset(offset) {
+        this._bwdRelativeOffset = offset;
     }
 
     stepRotor() {
@@ -52,16 +71,17 @@ class Rotor {
     encipher(letter, forwards) {
         // get input letter to rotor which is the alphabet index of the letter plus the rotor's current position
         const idx = Utility.getCharacterCode(letter);
-        const rotorPosIdx = Utility.getCharacterCode(this._position);
-        const mappingIdx = Utility.getModulo(idx + rotorPosIdx, 26);
 
-        if(forwards) {           
-            return this._mapping[mappingIdx];
+        if(forwards) {
+            const mappingIdx = Utility.getModulo(idx + this.forwardsRelativeOffset, 26);
+            return this.mapping[mappingIdx];
 
-        } else if(!forwards) {
+        } else {
+            const mappingIdx = Utility.getModulo(idx + this.backwardsRelativeOffset, 26);
+
             // for backwards mapping we must get the index of the input letter from the mapping (+65 as A is ASCII code 65)
             const inputLetter = Utility.getCharacterFromCode(mappingIdx + 65);
-            const inputLetterIdx = this._mapping.findIndex(el => el === inputLetter);
+            const inputLetterIdx = this.mapping.findIndex(el => el === inputLetter);
 
             return Utility.getCharacterFromCode(inputLetterIdx + 65);
         }
