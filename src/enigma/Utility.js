@@ -21,6 +21,18 @@ class Utility {
         // JavaScript, in place of a % n, use ((a % n ) + n ) % n.
         return ((val % modulus) + modulus) % modulus;
     }
+
+    static getRelativeOffset(inPos, outPos) {
+        const inCharCode = Utility.getCharacterCode(inPos);
+        const outCharCode = Utility.getCharacterCode(outPos);
+
+        if(inCharCode > outCharCode) {
+            // wrap around to get back to outPos
+            return (26 - inCharCode) + outCharCode;
+        } else {
+            return outCharCode - inCharCode;
+        }
+    }
 }
 
 export default Utility;

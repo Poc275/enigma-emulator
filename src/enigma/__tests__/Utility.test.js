@@ -50,3 +50,17 @@ ${"W"} | ${5}  | ${"B"}
     const shiftedLetter = Utility.getShiftedLetter(letter, shift);
     expect(shiftedLetter).toEqual(expected);
 });
+
+test.each`
+inPos    | outPos  | expected
+${"A"}   | ${"A"}  | ${0}
+${"A"}   | ${"B"}  | ${1}
+${"B"}   | ${"A"}  | ${25}
+${"B"}   | ${"D"}  | ${2}
+${"A"}   | ${"Z"}  | ${25}
+${"W"}   | ${"D"}  | ${7}
+${"D"}   | ${"W"}  | ${19}
+`("getRelativeOffset returns $expected when input position is $inPos and output position is $outPos", ({inPos, outPos, expected}) => {
+    const offset = Utility.getRelativeOffset(inPos, outPos);
+    expect(offset).toEqual(expected);
+});
