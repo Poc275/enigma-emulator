@@ -104,8 +104,11 @@ class Enigma {
         this.calculateRelativeOffsets();
 
         // now we can encipher the letter
+        // first it goes through the plugboard
+        const plugboardIn = this.plugboard.convert(letter);
+
         // forwards...
-        const rhsFwdOut = this.rhsRotor.encipher(letter, true);
+        const rhsFwdOut = this.rhsRotor.encipher(plugboardIn, true);
         const midFwdOut = this.middleRotor.encipher(rhsFwdOut, true);
         const lhsFwdOut = this.lhsRotor.encipher(midFwdOut, true);
 
@@ -120,7 +123,10 @@ class Enigma {
         // entry rotor (ETW)
         const etwOut = this.entryRotor.getEntryRotorOutput(rhsBwdOut);
 
-        return etwOut;
+        // and back out the plugboard
+        const plugboardOut = this.plugboard.convert(etwOut);
+
+        return plugboardOut;
     }
 }
 
