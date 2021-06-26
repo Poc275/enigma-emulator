@@ -1,7 +1,20 @@
 import Utility from "./Utility";
 
+/**
+ * Enigma machine class.
+ */
 class Enigma {
 
+    /**
+     * Engima machine constructor.
+     * @constructor
+     * @param {Plugboard} plugboard - Plugboard
+     * @param {EntryRotor} entryRotor - Entry rotor
+     * @param {Rotor} rhsRotor - Right-hand (fast) rotor
+     * @param {Rotor} mRotor - Middle (slower) rotor
+     * @param {Rotor} lhsRotor - Left-hand (slowest) rotor
+     * @param {Reflector} reflector - Reflector
+     */
     constructor(plugboard, entryRotor, rhsRotor, mRotor, lhsRotor, reflector) {
         this._plugboard = plugboard;
         this._entryRotor = entryRotor;
@@ -16,41 +29,73 @@ class Enigma {
         this.doubleStepCheck();
     }
 
+    /**
+     * Get the enigma plugboard.
+     * @returns {Plugboard} The enigma plugboard.
+     */
     get plugboard() {
         return this._plugboard;
     }
 
+    /**
+     * Get the enigma entry rotor.
+     * @returns {EntryRotor} The enigma entry rotor.
+     */
     get entryRotor() {
         return this._entryRotor;
     }
 
+    /**
+     * Get the enigma right-hand (fast) rotor.
+     * @returns {Rotor} The enigma right-hand (fast) rotor.
+     */
     get rhsRotor() {
         return this._rhsRotor;
     }
 
+    /**
+     * Get the enigma middle (slower) rotor.
+     * @returns {Rotor} The enigma middle (slower) rotor.
+     */
     get middleRotor() {
         return this._mRotor;
     }
 
+    /**
+     * Get the enigma left-hand (slowest) rotor.
+     * @returns {Rotor} The enigma left-hand (slowest) rotor.
+     */
     get lhsRotor() {
         return this._lhsRotor;
     }
 
+    /**
+     * Get the enigma reflector.
+     * @returns {Reflector} The enigma reflector.
+     */
     get reflector() {
         return this._reflector;
     }
 
-    get relativeOffsets() {
-        return this._relativeOffsets;
-    }
-
+    /**
+     * Get the double step setting.
+     * @returns {boolean} The double step setting.
+     */
     get doubleStep() {
         return this._doubleStep;
     }
+
+    /**
+     * Set the enigma double step setting.
+     * @param {boolean} val - Next step is a double step (true) or not (false).
+     */
     set doubleStep(val) {
         this._doubleStep = val;
     }
 
+    /**
+     * Calculates the relative offsets between rotors, reflector and entry rotor in both directions.
+     */
     calculateRelativeOffsets() {
         // forwards offsets
         // Input to the RHS rotor comes from the entry rotor (ETW) which doesn't move so is always in the 'A' position
@@ -68,6 +113,9 @@ class Enigma {
         this.entryRotor.relativeOffset = Utility.getRelativeOffset(this.rhsRotor.position, "A");
     }
 
+    /**
+     * Checks if the next step is to be a double step.
+     */
     doubleStepCheck() {
         this.middleRotor.stepPoints.forEach(stepPoint => {
             // we need to check if the middle rotor is in its notch position i.e. the next step 
@@ -78,6 +126,11 @@ class Enigma {
         });
     }
 
+    /**
+     * Scrambles a letter through the Engima.
+     * @param {string} letter - Letter to encipher.
+     * @returns {string} Scrambled letter. 
+     */
     encipher(letter) {
         // advance rotors once an enigma key is pressed BEFORE enciphering any letters
         // the rhs rotor always steps after every keypress

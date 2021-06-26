@@ -1,7 +1,18 @@
 import Utility from "./Utility";
 
+/**
+ * Enigma rotor class.
+ */
 class Rotor {
 
+    /**
+     * Rotor constructor.
+     * @constructor
+     * @param {Array} mapping - Rotor permutations ordered from A-Z
+     * @param {string} startPosition - Rotor start position letter
+     * @param {number} ringSetting - Rotor ring setting
+     * @param {Array} stepPoints - Array of letter positions where the rotor stepping mechanism is applied
+     */
     constructor(mapping, startPosition, ringSetting, stepPoints) {
         this._mapping = [...mapping];
         this._position = startPosition;
@@ -12,46 +23,88 @@ class Rotor {
         this.applyRingSetting();
     }
 
+    /**
+     * Get the rotor mapping.
+     * @returns {Array} The rotor mapping.
+     */
     get mapping() {
         return this._mapping;
     }
 
+    /**
+     * Get the current rotor position.
+     * @returns {string} The current rotor position letter.
+     */
     get position() {
         return this._position;
     }
 
+    /**
+     * Set the rotor position.
+     * @param {string} pos - The rotor position letter
+     */
     set position(pos) {
         this._position = pos;
     }
 
+    /**
+     * Get the rotor ring setter.
+     * @returns {number} The rotor ring setting.
+     */
     get ringSetting() {
         return this._ringSetting;
     }
 
+    /**
+     * Get the rotor step points.
+     * @returns {Array} The rotor step points.
+     */
     get stepPoints() {
         return this._stepPoints;
     }
 
+    /**
+     * Get the relative offset in the forward direction.
+     * @returns {number} The relative offset in the forward direction.
+     */
     get forwardsRelativeOffset() {
         return this._fwdRelativeOffset;
     }
 
+    /**
+     * Set the relative offset in the forward direction.
+     * @param {number} offset - Relative offset in the forward direction
+     */
     set forwardsRelativeOffset(offset) {
         this._fwdRelativeOffset = offset;
     }
 
+    /**
+     * Get the relative offset in the backward direction.
+     * @returns {number} The relative offset in the backward direction.
+     */
     get backwardsRelativeOffset() {
         return this._bwdRelativeOffset;
     }
 
+    /**
+     * Set the relative offset in the backward direction.
+     * @param {number} offset - Relative offset in the backward direction
+     */
     set backwardsRelativeOffset(offset) {
         this._bwdRelativeOffset = offset;
     }
 
+    /**
+     * Steps the rotor to its next position.
+     */
     stepRotor() {
         this._position = Utility.getShiftedLetter(this._position, 1);
     }
 
+    /**
+     * Applies the ring setting to the rotor.
+     */
     applyRingSetting() {
         // the engima ring setting shifts the mappings between letters i.e. the output
         const shiftedLetters = [];
@@ -72,6 +125,12 @@ class Rotor {
         });
     }
 
+    /**
+     * Scrambles a letter through the rotor.
+     * @param {string} letter - Letter to encipher
+     * @param {boolean} forwards - Forward direction (true) or backwards (false)
+     * @returns {string} - Scrambled letter.
+     */
     encipher(letter, forwards) {
         // get input letter to rotor which is the alphabet index of the letter plus the rotor's current position
         const idx = Utility.getCharacterCode(letter);
