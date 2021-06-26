@@ -9,20 +9,23 @@ const rotorIIMapping = ["A", "J", "D", "K", "S", "I", "R", "U", "X", "B", "L", "
 const rotorIIIMapping = ["B", "D", "F", "H", "J", "L", "C", "P", "R", "T", "X", "V", "Z", "N", "Y", "E", "I", "W", "G", "A", "K", "M", "U", "S", "Q", "O"];
 const rotorIVMapping = ["E", "S", "O", "V", "P", "Z", "J", "A", "Y", "Q", "U", "I", "R", "H", "X", "L", "N", "F", "T", "G", "K", "D", "C", "M", "W", "B"];
 const rotorVMapping = ["V", "Z", "B", "R", "G", "I", "T", "Y", "U", "P", "S", "D", "N", "H", "L", "X", "A", "W", "M", "J", "Q", "O", "F", "E", "C", "K"];
+const rotorVIMapping = ["J", "P", "G", "V", "O", "U", "M", "F", "Y", "Q", "B", "E", "N", "H", "Z", "R", "D", "K", "A", "S", "X", "L", "I", "C", "T", "W"];
+const rotorVIIMapping = ["N", "Z", "J", "H", "G", "R", "C", "X", "M", "Y", "S", "W", "B", "O", "U", "F", "A", "I", "V", "L", "P", "E", "K", "Q", "D", "T"];
+const rotorVIIIMapping = ["F", "K", "Q", "H", "T", "L", "X", "O", "C", "B", "J", "S", "P", "D", "Z", "R", "A", "M", "E", "W", "N", "I", "U", "Y", "G", "V"];
 
 test("instance is correct", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
 
     expect(enigma).toBeInstanceOf(Enigma);
 });
 
 test("enigma components are initialised", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
 
     expect(enigma.plugboard).toEqual(new Plugboard());
@@ -34,9 +37,9 @@ test("enigma components are initialised", () => {
 });
 
 test("relative offsets are initialised to zeroes when all rotors start in the A position", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
 
     expect(enigma.rhsRotor.forwardsRelativeOffset).toEqual(0);
@@ -50,9 +53,9 @@ test("relative offsets are initialised to zeroes when all rotors start in the A 
 });
 
 test("relative offsets are initialised correctly when rotors start in different positions", () => {
-    const rotorI = new Rotor(rotorIMapping, "B", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "D", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "W", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "B", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "D", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "W", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
 
     // forwards...
@@ -69,9 +72,9 @@ test("relative offsets are initialised correctly when rotors start in different 
 });
 
 test("relative offsets are updated correctly when the rotors step position", () => {
-    const rotorI = new Rotor(rotorIMapping, "B", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "D", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "W", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "B", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "D", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "W", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
 
     enigma.encipher("A");
@@ -92,9 +95,9 @@ test("relative offsets are updated correctly when the rotors step position", () 
 });
 
 test("encipher steps the rhs rotor after every letter", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
 
     enigma.encipher("A");
@@ -112,9 +115,9 @@ test("encipher steps the rhs rotor after every letter", () => {
 });
 
 test("encipher steps the middle rotor at the correct position", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "U", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "U", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
     
     enigma.encipher("A");
@@ -139,10 +142,93 @@ test("encipher steps the middle rotor at the correct position", () => {
     expect(enigma.doubleStep).toBeFalsy();
 });
 
+test("encipher steps the left rotor at the correct position", () => {
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "E", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "V", 1, ["W"]);
+    const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
+    
+    enigma.encipher("A");
+    // rhs rotor should have stepped once, moving the middle rotor and the left rotor in turn
+    expect(enigma.rhsRotor.position).toEqual("W");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // the next steps only move the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("X");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    expect(enigma.rhsRotor.position).toEqual("Y");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+});
+
+test("encipher steps the middle rotor at the correct position when the right hand rotor has multiple step points", () => {
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorVI = new Rotor(rotorVIMapping, "L", 1, ["A", "N"]);
+    const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorVI, rotorII, rotorI, new Reflector("B"));
+    
+    enigma.encipher("A");
+    // rhs rotor should have stepped once
+    expect(enigma.rhsRotor.position).toEqual("M");
+    expect(enigma.middleRotor.position).toEqual("A");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // now the rhs rotor reaches one of its step point the middle rotor should step as well
+    expect(enigma.rhsRotor.position).toEqual("N");
+    expect(enigma.middleRotor.position).toEqual("B");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // the next step only moves the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("O");
+    expect(enigma.middleRotor.position).toEqual("B");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
+});
+
+test("encipher steps the left rotor at the correct position when the middle rotor has multiple step points", () => {
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "E", 1, ["F"]);
+    const rotorVI = new Rotor(rotorVIMapping, "Z", 1, ["A", "N"]);
+    const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorII, rotorVI, rotorI, new Reflector("B"));
+    
+    enigma.encipher("A");
+    // middle rotor steps at A and N, so being in position Z it will move to A and step the lhs 
+    // when the rhs rotor reaches its step point at F
+    expect(enigma.rhsRotor.position).toEqual("F");
+    expect(enigma.middleRotor.position).toEqual("A");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // next steps should only move the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("G");
+    expect(enigma.middleRotor.position).toEqual("A");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    expect(enigma.rhsRotor.position).toEqual("H");
+    expect(enigma.middleRotor.position).toEqual("A");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+});
+
 test("encipher double steps the rotors after 3 key presses with rotor configuration R1-R2-R3 and start positions A-D-U", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "D", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "U", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "D", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "U", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
 
     enigma.encipher("A");
@@ -177,9 +263,9 @@ test("encipher double steps the rotors after 3 key presses with rotor configurat
 });
 
 test("encipher double steps the rotors after 4 key presses with rotor configuration R3-R2-R1 and start positions K-D-O", () => {
-    const rotorI = new Rotor(rotorIMapping, "O", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "D", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "K", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "O", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "D", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "K", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorI, rotorII, rotorIII, new Reflector("B"));
 
     enigma.encipher("A");
@@ -227,10 +313,46 @@ test("encipher double steps the rotors after 4 key presses with rotor configurat
     expect(enigma.doubleStep).toBeFalsy();
 });
 
+test("encipher double steps the rotors when the middle rotor has multiple step points", () => {
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "D", 1, ["F"]);
+    const rotorVI = new Rotor(rotorVIMapping, "Y", 1, ["A", "N"]);
+    const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorII, rotorVI, rotorI, new Reflector("B"));
+
+    enigma.encipher("A");
+    // rhs rotor should have stepped once
+    expect(enigma.rhsRotor.position).toEqual("E");
+    expect(enigma.middleRotor.position).toEqual("Y");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // now the rhs rotor reaches its step point the middle rotor should step as well
+    expect(enigma.rhsRotor.position).toEqual("F");
+    expect(enigma.middleRotor.position).toEqual("Z");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    // because the middle rotor has moved into one of its step positions, the next key press will be a double step
+    expect(enigma.doubleStep).toBeTruthy();
+
+    enigma.encipher("A");
+    // double step
+    expect(enigma.rhsRotor.position).toEqual("G");
+    expect(enigma.middleRotor.position).toEqual("A");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // the next step only moves the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("H");
+    expect(enigma.middleRotor.position).toEqual("A");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+});
+
 test("encipher returns correct letter with enigma set to base configuration", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
     const result = enigma.encipher("A");
 
@@ -238,9 +360,9 @@ test("encipher returns correct letter with enigma set to base configuration", ()
 });
 
 test("encipher returns correct letter with enigma set with different start positions and ring settings", () => {
-    const rotorI = new Rotor(rotorIMapping, "B", 6, "R");
-    const rotorII = new Rotor(rotorIIMapping, "C", 2, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "V", 2, "W");
+    const rotorI = new Rotor(rotorIMapping, "B", 6, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "C", 2, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "V", 2, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
     const result = enigma.encipher("A");
 
@@ -248,9 +370,9 @@ test("encipher returns correct letter with enigma set with different start posit
 });
 
 test("encipher returns correct sequence with enigma set to base configuration", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 1, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
     
     const sequence = [];
@@ -263,9 +385,9 @@ test("encipher returns correct sequence with enigma set to base configuration", 
 });
 
 test("encipher returns correct sequence with ring settings in B-position", () => {
-    const rotorI = new Rotor(rotorIMapping, "A", 2, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 2, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "A", 2, "W");
+    const rotorI = new Rotor(rotorIMapping, "A", 2, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 2, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "A", 2, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
     
     const sequence = [];
@@ -280,9 +402,9 @@ test("encipher returns correct sequence with ring settings in B-position", () =>
 test("encipher decodes enigma instruction manual message", () => {
     // this test comes from: http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages
     // using the Enigma Instruction Manual, 1930  message with key (rotor start positions) ABL
-    const rotorI = new Rotor(rotorIMapping, "B", 13, "R");
-    const rotorII = new Rotor(rotorIIMapping, "A", 24, "F");
-    const rotorIII = new Rotor(rotorIIIMapping, "L", 22, "W");
+    const rotorI = new Rotor(rotorIMapping, "B", 13, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 24, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "L", 22, ["W"]);
     const plugboard = new Plugboard();
     plugboard.addSetting("A", "M");
     plugboard.addSetting("F", "I");
@@ -309,9 +431,9 @@ test("encipher decodes enigma instruction manual message", () => {
 test("encipher decodes operation barbarossa message", () => {
     // this test comes from: http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages
     // using the Operation Barbarossa, 1941 message. Part 1 had key BLA:
-    const rotorII = new Rotor(rotorIIMapping, "B", 2, "F");
-    const rotorIV = new Rotor(rotorIVMapping, "L", 21, "K");
-    const rotorV = new Rotor(rotorVMapping, "A", 12, "A");
+    const rotorII = new Rotor(rotorIIMapping, "B", 2, ["F"]);
+    const rotorIV = new Rotor(rotorIVMapping, "L", 21, ["K"]);
+    const rotorV = new Rotor(rotorVMapping, "A", 12, ["A"]);
     const plugboard = new Plugboard();
     plugboard.addSetting("A", "V");
     plugboard.addSetting("B", "S");

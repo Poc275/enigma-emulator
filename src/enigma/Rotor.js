@@ -2,13 +2,13 @@ import Utility from "./Utility";
 
 class Rotor {
 
-    constructor(mapping, startPosition, ringSetting, stepPoint) {
+    constructor(mapping, startPosition, ringSetting, stepPoints) {
         this._mapping = [...mapping];
         this._position = startPosition;
         this._fwdRelativeOffset = 0;
         this._bwdRelativeOffset = 0;
         this._ringSetting = ringSetting;
-        this._stepPoint = stepPoint;
+        this._stepPoints = [...stepPoints];
         this.applyRingSetting();
     }
 
@@ -28,8 +28,8 @@ class Rotor {
         return this._ringSetting;
     }
 
-    get stepPoint() {
-        return this._stepPoint;
+    get stepPoints() {
+        return this._stepPoints;
     }
 
     get forwardsRelativeOffset() {

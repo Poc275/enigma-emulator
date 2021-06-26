@@ -76,28 +76,30 @@ class Enigma {
             this.doubleStep = false;
 
             // middle rotor has stepped, check if the lhs rotor is to be stepped
-            if(this.middleRotor.position === this.middleRotor.stepPoint) {
+            if(this.middleRotor.stepPoints.includes(this.middleRotor.position)) {
                 // middle rotor has reached its turnover point, advance the lhs rotor
                 this.lhsRotor.stepRotor();
             }
         }
 
         // check if the adjacent rotors are stepped
-        if(this.rhsRotor.position === this.rhsRotor.stepPoint) {
+        if(this.rhsRotor.stepPoints.includes(this.rhsRotor.position)) {
             // rhs rotor has reached its turnover point, advance the middle rotor
             this.middleRotor.stepRotor();
 
             // middle rotor has stepped, check if the lhs rotor is to be stepped
-            if(this.middleRotor.position === this.middleRotor.stepPoint) {
+            if(this.middleRotor.stepPoints.includes(this.middleRotor.position)) {
                 this.lhsRotor.stepRotor();
             }
 
             // if the middle rotor has moved into its notch position then on the 
             // next keypress the lhs rotor will be moved which will also move the 
             // middle rotor i.e. a double step
-            if(this.middleRotor.position === Utility.getShiftedLetter(this.middleRotor.stepPoint, -1)) {
-                this.doubleStep = true;
-            }
+            this.middleRotor.stepPoints.forEach(stepPoint => {
+                if(this.middleRotor.position === Utility.getShiftedLetter(stepPoint, -1)) {
+                    this._doubleStep = true;
+                }
+            })
         }
 
         // update rotor relative offset positions once they have stepped
