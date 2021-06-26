@@ -7,6 +7,8 @@ import Reflector from "../Reflector";
 const rotorIMapping = ["E", "K", "M", "F", "L", "G", "D", "Q", "V", "Z", "N", "T", "O", "W", "Y", "H", "X", "U", "S", "P", "A", "I", "B", "R", "C", "J"];
 const rotorIIMapping = ["A", "J", "D", "K", "S", "I", "R", "U", "X", "B", "L", "H", "W", "T", "M", "C", "Q", "G", "Z", "N", "P", "Y", "F", "V", "O", "E"];
 const rotorIIIMapping = ["B", "D", "F", "H", "J", "L", "C", "P", "R", "T", "X", "V", "Z", "N", "Y", "E", "I", "W", "G", "A", "K", "M", "U", "S", "Q", "O"];
+const rotorIVMapping = ["E", "S", "O", "V", "P", "Z", "J", "A", "Y", "Q", "U", "I", "R", "H", "X", "L", "N", "F", "T", "G", "K", "D", "C", "M", "W", "B"];
+const rotorVMapping = ["V", "Z", "B", "R", "G", "I", "T", "Y", "U", "P", "S", "D", "N", "H", "L", "X", "A", "W", "M", "J", "Q", "O", "F", "E", "C", "K"];
 
 test("instance is correct", () => {
     const rotorI = new Rotor(rotorIMapping, "A", 1, "R");
@@ -275,7 +277,7 @@ test("encipher returns correct sequence with ring settings in B-position", () =>
     expect(sequence.join("")).toEqual("EWTYX");
 });
 
-test("encipher returns correct message with plugboard settings set", () => {
+test("encipher decodes enigma instruction manual message", () => {
     // this test comes from: http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages
     // using the Enigma Instruction Manual, 1930  message with key (rotor start positions) ABL
     const rotorI = new Rotor(rotorIMapping, "B", 13, "R");
@@ -302,4 +304,61 @@ test("encipher returns correct message with plugboard settings set", () => {
     // (English): ENEMY         INFANTRY   COLUMNS OBSERVED      . BEGINNING AT SOUTH EXIT OF    BAERWALDE . ENDING THREE KM  EAST OF   NEUSTADT.
     const expected = "FEINDLIQEINFANTERIEKOLONNEBEOBAQTETXANFANGSUEDAUSGANGBAERWALDEXENDEDREIKMOSTWAERTSNEUSTADT";
     expect(encipheredMsg.join("")).toEqual(expected);
+});
+
+test("encipher decodes operation barbarossa message", () => {
+    // this test comes from: http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages
+    // using the Operation Barbarossa, 1941 message. Part 1 had key BLA:
+    const rotorII = new Rotor(rotorIIMapping, "B", 2, "F");
+    const rotorIV = new Rotor(rotorIVMapping, "L", 21, "K");
+    const rotorV = new Rotor(rotorVMapping, "A", 12, "A");
+    const plugboard = new Plugboard();
+    plugboard.addSetting("A", "V");
+    plugboard.addSetting("B", "S");
+    plugboard.addSetting("C", "G");
+    plugboard.addSetting("D", "L");
+    plugboard.addSetting("F", "U");
+    plugboard.addSetting("H", "Z");
+    plugboard.addSetting("I", "N");
+    plugboard.addSetting("K", "M");
+    plugboard.addSetting("O", "W");
+    plugboard.addSetting("R", "X");
+
+    const enigma = new Enigma(plugboard, new EntryRotor(), rotorV, rotorIV, rotorII, new Reflector("B"));
+    const message = "EDPUDNRGYSZRCXNUYTPOMRMBOFKTBZREZKMLXLVEFGUEYSIOZVEQMIKUBPMMYLKLTTDEISMDICAGYKUACTCDOMOHWXMUUIAUBSTSLRNBZSZWNRFXWFY" + 
+        "SSXJZVIJHIDISHPRKLKAYUPADTXQSPINQMATLPIFSVKDASCTACDPBOPVHJK";
+
+    const encipheredMsg = [];
+    for(let i = 0; i < message.length; i++) {
+        encipheredMsg.push(enigma.encipher(message.charAt(i)));
+    }
+
+    // Part 2 of the message uses key LSD:
+    rotorII.position = "L";
+    rotorIV.position = "S";
+    rotorV.position = "D";
+
+    const messgeP2 = "SFBWDNJUSEGQOBHKRTAREEZMWKPPRBXOHDROEQGBBGTQVPGVKBVVGBIMHUSZYDAJQIROAXSSSNREHYGGRPISEZBOVMQIEMMZCYSGQDGRERVBILEKXYQIRGIRQNRDNVRXCYYTNJR";
+    for(let i = 0; i < messgeP2.length; i++) {
+        encipheredMsg.push(enigma.encipher(messgeP2.charAt(i)));
+    }
+
+    // Enigma conventions: X for a space/full stop, J for a quotation mark, Q = CH
+    // (German):  AUFKL X ABTEILUNG X VON X KURTINOWA X KURTINOWA X NORDWESTL X SEBEZ X SEBEZ X UAF FLIEGERSTRASZE  RICH(Q)TUNG X DUBROWKI X DUBROWKI X OPOTSCHKA X OPOTSCHKA X 
+    // (English): RECON   DIVISION    OF    KURTINOWA   KURTINOWA   NORTH-WEST  SEBEZ   SEBEZ   ON  FLIGHT CORRIDOR TOWARDS       DUBROWKI   DUBROWKI   OPOCHKA     OPOCHKA
+    //
+    // (German):  UM     X EINS ACH(Q)T DREI  NULL X UHR   ANGETRETEN X ANGRIFF X INF X RGT  X
+    // (English): AROUND   ONE  EIGHT   THREE ZERO   HOURS ARRIVED      ATTACK    INF.  RGT.
+    //
+    // Part 2:
+    // (German):  DREI  GEHT LANGSAM ABER SICH(Q)ER VORWAERTS X EINS SIEBEN NULL SECH(Q)S X UHR   X ROEM            X EINS X INF  RGT  X DREI  X AUF FLIEGERSTRASZE  MIT ANFANG X
+    // (English): THREE GOES SLOWLY  BUT  SURELY    FORWARDS    ONE  SEVEN  ZERO SIX        HOURS   (ROMAN NUMERAL)   ONE    INF. RGT.   THREE   ON  FLIGHT CORRIDOR BEGINNING 
+    // 
+    // (German):  EINSSECH(Q)S X KM X KM X OSTW X KAMENEC X K
+    // (English): SIXTEEN        KM   KM   EAST   KAMENEC   (truncated...)
+    const expectedP1 = "AUFKLXABTEILUNGXVONXKURTINOWAXKURTINOWAXNORDWESTLXSEBEZXSEBEZXUAFFLIEGERSTRASZERIQTUNGXDUBROWKIXDUBROWKIXOPOTSCHKAX" + 
+        "OPOTSCHKAXUMXEINSAQTDREINULLXUHRANGETRETENXANGRIFFXINFXRGTX";
+    const expectedP2 = "DREIGEHTLANGSAMABERSIQERVORWAERTSXEINSSIEBENNULLSEQSXUHRXROEMXEINSXINFRGTXDREIXAUFFLIEGERSTRASZEMITANFANGXEINSSEQSXKMXKMXOSTWXKAMENECXK";
+    
+    expect(encipheredMsg.join("")).toEqual(expectedP1.concat(expectedP2));
 });
