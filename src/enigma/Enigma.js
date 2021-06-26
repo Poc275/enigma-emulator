@@ -10,7 +10,10 @@ class Enigma {
         this._lhsRotor = lhsRotor;
         this._reflector = reflector;
         this._doubleStep = false;
+
         this.calculateRelativeOffsets();
+        // we could potentially start in double step conditions
+        this.doubleStepCheck();
     }
 
     get plugboard() {
@@ -65,12 +68,22 @@ class Enigma {
         this.entryRotor.relativeOffset = Utility.getRelativeOffset(this.rhsRotor.position, "A");
     }
 
+    doubleStepCheck() {
+        this.middleRotor.stepPoints.forEach(stepPoint => {
+            // we need to check if the middle rotor is in its notch position i.e. the next step 
+            // will engage the notch which is why -1 from the step point
+            if(this.middleRotor.position === Utility.getShiftedLetter(stepPoint, -1)) {
+                this._doubleStep = true;
+            }
+        });
+    }
+
     encipher(letter) {
         // advance rotors once an enigma key is pressed BEFORE enciphering any letters
         // the rhs rotor always steps after every keypress
         this.rhsRotor.stepRotor();
 
-        // double step check
+        // double step?
         if(this.doubleStep) {
             this.middleRotor.stepRotor();
             this.doubleStep = false;
@@ -80,26 +93,22 @@ class Enigma {
                 // middle rotor has reached its turnover point, advance the lhs rotor
                 this.lhsRotor.stepRotor();
             }
-        }
+        } else {
+            // check if the adjacent rotors are stepped
+            if(this.rhsRotor.stepPoints.includes(this.rhsRotor.position)) {
+                // rhs rotor has reached its turnover point, advance the middle rotor
+                this.middleRotor.stepRotor();
 
-        // check if the adjacent rotors are stepped
-        if(this.rhsRotor.stepPoints.includes(this.rhsRotor.position)) {
-            // rhs rotor has reached its turnover point, advance the middle rotor
-            this.middleRotor.stepRotor();
-
-            // middle rotor has stepped, check if the lhs rotor is to be stepped
-            if(this.middleRotor.stepPoints.includes(this.middleRotor.position)) {
-                this.lhsRotor.stepRotor();
-            }
-
-            // if the middle rotor has moved into its notch position then on the 
-            // next keypress the lhs rotor will be moved which will also move the 
-            // middle rotor i.e. a double step
-            this.middleRotor.stepPoints.forEach(stepPoint => {
-                if(this.middleRotor.position === Utility.getShiftedLetter(stepPoint, -1)) {
-                    this._doubleStep = true;
+                // middle rotor has stepped, check if the lhs rotor is to be stepped
+                if(this.middleRotor.stepPoints.includes(this.middleRotor.position)) {
+                    this.lhsRotor.stepRotor();
                 }
-            })
+
+                // if the middle rotor has moved into its notch position then on the 
+                // next keypress the lhs rotor will be moved which will also move the 
+                // middle rotor i.e. a double step, so check for this here
+                this.doubleStepCheck();
+            }
         }
 
         // update rotor relative offset positions once they have stepped

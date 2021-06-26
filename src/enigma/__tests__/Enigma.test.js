@@ -34,6 +34,7 @@ test("enigma components are initialised", () => {
     expect(enigma.middleRotor).toEqual(rotorII);
     expect(enigma.rhsRotor).toEqual(rotorIII);
     expect(enigma.reflector).toEqual(new Reflector("B"));
+    expect(enigma.doubleStep).toBeFalsy();
 });
 
 test("relative offsets are initialised to zeroes when all rotors start in the A position", () => {
@@ -119,6 +120,8 @@ test("encipher steps the middle rotor at the correct position", () => {
     const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
     const rotorIII = new Rotor(rotorIIIMapping, "U", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
+
+    expect(enigma.doubleStep).toBeFalsy();
     
     enigma.encipher("A");
     // rhs rotor should have stepped once
@@ -144,26 +147,27 @@ test("encipher steps the middle rotor at the correct position", () => {
 
 test("encipher steps the left rotor at the correct position", () => {
     const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
-    const rotorII = new Rotor(rotorIIMapping, "E", 1, ["F"]);
-    const rotorIII = new Rotor(rotorIIIMapping, "V", 1, ["W"]);
+    const rotorII = new Rotor(rotorIIMapping, "A", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "A", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
+
+    expect(enigma.doubleStep).toBeFalsy();
     
-    enigma.encipher("A");
-    // rhs rotor should have stepped once, moving the middle rotor and the left rotor in turn
+    // middle rotor steps at "W" which is 22 steps, then every 26 steps
+    // lhs rotor steps at "F" which is 4 full revolutions of the middle rotor
+    // 26 * 3 + 22 = 100
+    for(let i = 0; i < 100; i++) {
+        enigma.encipher("A");
+    }
+
     expect(enigma.rhsRotor.position).toEqual("W");
-    expect(enigma.middleRotor.position).toEqual("F");
-    expect(enigma.lhsRotor.position).toEqual("B");
-    expect(enigma.doubleStep).toBeFalsy();
+    expect(enigma.middleRotor.position).toEqual("E");
+    expect(enigma.lhsRotor.position).toEqual("A");
+    expect(enigma.doubleStep).toBeTruthy();
 
+    // double step
     enigma.encipher("A");
-    // the next steps only move the rhs rotor
     expect(enigma.rhsRotor.position).toEqual("X");
-    expect(enigma.middleRotor.position).toEqual("F");
-    expect(enigma.lhsRotor.position).toEqual("B");
-    expect(enigma.doubleStep).toBeFalsy();
-
-    enigma.encipher("A");
-    expect(enigma.rhsRotor.position).toEqual("Y");
     expect(enigma.middleRotor.position).toEqual("F");
     expect(enigma.lhsRotor.position).toEqual("B");
     expect(enigma.doubleStep).toBeFalsy();
@@ -175,6 +179,8 @@ test("encipher steps the middle rotor at the correct position when the right han
     const rotorVI = new Rotor(rotorVIMapping, "L", 1, ["A", "N"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorVI, rotorII, rotorI, new Reflector("B"));
     
+    expect(enigma.doubleStep).toBeFalsy();
+
     enigma.encipher("A");
     // rhs rotor should have stepped once
     expect(enigma.rhsRotor.position).toEqual("M");
@@ -203,6 +209,9 @@ test("encipher steps the left rotor at the correct position when the middle roto
     const rotorVI = new Rotor(rotorVIMapping, "Z", 1, ["A", "N"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorII, rotorVI, rotorI, new Reflector("B"));
     
+    // this should start with a double step
+    expect(enigma.doubleStep).toBeTruthy();
+
     enigma.encipher("A");
     // middle rotor steps at A and N, so being in position Z it will move to A and step the lhs 
     // when the rhs rotor reaches its step point at F
@@ -230,6 +239,8 @@ test("encipher double steps the rotors after 3 key presses with rotor configurat
     const rotorII = new Rotor(rotorIIMapping, "D", 1, ["F"]);
     const rotorIII = new Rotor(rotorIIIMapping, "U", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
+
+    expect(enigma.doubleStep).toBeFalsy();
 
     enigma.encipher("A");
     // rhs rotor should have stepped once
@@ -267,6 +278,8 @@ test("encipher double steps the rotors after 4 key presses with rotor configurat
     const rotorII = new Rotor(rotorIIMapping, "D", 1, ["F"]);
     const rotorIII = new Rotor(rotorIIIMapping, "K", 1, ["W"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorI, rotorII, rotorIII, new Reflector("B"));
+
+    expect(enigma.doubleStep).toBeFalsy();
 
     enigma.encipher("A");
     // rhs rotor should have stepped once
@@ -313,11 +326,77 @@ test("encipher double steps the rotors after 4 key presses with rotor configurat
     expect(enigma.doubleStep).toBeFalsy();
 });
 
+test("encipher double steps at the first key press if the conditions are met", () => {
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "E", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "V", 1, ["W"]);
+    const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
+    
+    // this should cause a double step for the very first key press
+    expect(enigma.doubleStep).toBeTruthy();
+
+    enigma.encipher("A");
+    // rhs rotor should have stepped once, moving the middle rotor and the left rotor in turn
+    expect(enigma.rhsRotor.position).toEqual("W");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    // the next steps only move the rhs rotor
+    expect(enigma.rhsRotor.position).toEqual("X");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    enigma.encipher("A");
+    expect(enigma.rhsRotor.position).toEqual("Y");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+});
+
+test("encipher double steps multiple times", () => {
+    const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
+    const rotorII = new Rotor(rotorIIMapping, "E", 1, ["F"]);
+    const rotorIII = new Rotor(rotorIIIMapping, "V", 1, ["W"]);
+    const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorIII, rotorII, rotorI, new Reflector("B"));
+    
+    // this should cause a double step for the very first key press
+    expect(enigma.doubleStep).toBeTruthy();
+
+    enigma.encipher("A");
+    // rhs rotor should have stepped once, moving the middle rotor and the left rotor in turn
+    expect(enigma.rhsRotor.position).toEqual("W");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeFalsy();
+
+    // enter enough key presses to get a second double step (26 * 25 = 650)
+    for(let i = 0; i < 650; i++) {
+        enigma.encipher("A");
+    }
+
+    expect(enigma.rhsRotor.position).toEqual("W");
+    expect(enigma.middleRotor.position).toEqual("E");
+    expect(enigma.lhsRotor.position).toEqual("B");
+    expect(enigma.doubleStep).toBeTruthy();
+
+    enigma.encipher("A");
+    // now we double step a second time
+    expect(enigma.rhsRotor.position).toEqual("X");
+    expect(enigma.middleRotor.position).toEqual("F");
+    expect(enigma.lhsRotor.position).toEqual("C");
+    expect(enigma.doubleStep).toBeFalsy();
+});
+
 test("encipher double steps the rotors when the middle rotor has multiple step points", () => {
     const rotorI = new Rotor(rotorIMapping, "A", 1, ["R"]);
     const rotorII = new Rotor(rotorIIMapping, "D", 1, ["F"]);
     const rotorVI = new Rotor(rotorVIMapping, "Y", 1, ["A", "N"]);
     const enigma = new Enigma(new Plugboard(), new EntryRotor(), rotorII, rotorVI, rotorI, new Reflector("B"));
+
+    expect(enigma.doubleStep).toBeFalsy();
 
     enigma.encipher("A");
     // rhs rotor should have stepped once
@@ -483,4 +562,38 @@ test("encipher decodes operation barbarossa message", () => {
     const expectedP2 = "DREIGEHTLANGSAMABERSIQERVORWAERTSXEINSSIEBENNULLSEQSXUHRXROEMXEINSXINFRGTXDREIXAUFFLIEGERSTRASZEMITANFANGXEINSSEQSXKMXKMXOSTWXKAMENECXK";
     
     expect(encipheredMsg.join("")).toEqual(expectedP1.concat(expectedP2));
+});
+
+test("encipher decodes battleship scharnhorst message", () => {
+    // this test comes from: http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages
+    // using the Scharnhorst (Konteradmiral Erich Bey), 1943  message with key (rotor start positions) UZV   
+    const rotorIII = new Rotor(rotorIIIMapping, "U", 1, ["W"]);
+    const rotorVI = new Rotor(rotorVIMapping, "Z", 8, ["A", "N"]);
+    const rotorVIII = new Rotor(rotorVIIIMapping, "V", 13, ["A", "N"]);
+
+    const plugboard = new Plugboard();
+    plugboard.addSetting("A", "N");
+    plugboard.addSetting("E", "Z");
+    plugboard.addSetting("H", "K");
+    plugboard.addSetting("I", "J");
+    plugboard.addSetting("L", "R");
+    plugboard.addSetting("M", "Q");
+    plugboard.addSetting("O", "T");
+    plugboard.addSetting("P", "V");
+    plugboard.addSetting("S", "W");
+    plugboard.addSetting("U", "X");
+
+    const enigma = new Enigma(plugboard, new EntryRotor(), rotorVIII, rotorVI, rotorIII, new Reflector("B"));
+    const message = "YKAENZAPMSCHZBFOCUVMRMDPYCOFHADZIZMEFXTHFLOLPZLFGGBOTGOXGRETDWTJIQHLMXVJWKZUASTR";
+    
+    const encipheredMsg = [];
+    for(let i = 0; i < message.length; i++) {
+        encipheredMsg.push(enigma.encipher(message.charAt(i)));
+    }
+
+    // Enigma conventions: X for a space/full stop, J for a quotation mark, Q = CH
+    // (German):  STEUERE J TANAFJORD J AN STANDORT QUA    AA CCC VIER NEUN NEUN ZWO FAHRT ZWO NUL  SM X X SCHARNHORST HCO
+    // (English): STEER   " TANAFJORD " AT LOCATION SQUARE A  C   FOUR NINE NINE TWO SPEED TWO ZERO SM     SCHARNHORST (padding?)
+    const expected = "STEUEREJTANAFJORDJANSTANDORTQUAAACCCVIERNEUNNEUNZWOFAHRTZWONULSMXXSCHARNHORSTHCO";
+    expect(encipheredMsg.join("")).toEqual(expected);
 });
