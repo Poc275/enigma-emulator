@@ -20,6 +20,10 @@ class Rotor {
         return this._position;
     }
 
+    set position(pos) {
+        this._position = pos;
+    }
+
     get ringSetting() {
         return this._ringSetting;
     }

@@ -18,6 +18,14 @@ test("fields are set correctly", () => {
     expect(rotor.backwardsRelativeOffset).toEqual(0);
 });
 
+test("position setter sets the correct value", () => {
+    const rotor = new Rotor(rotorIMapping, "A", 1, "R");
+    expect(rotor.position).toEqual("A");
+
+    rotor.position = "L";
+    expect(rotor.position).toEqual("L");
+});
+
 test("relative offsets setters set the correct values", () => {
     const rotor = new Rotor(rotorIMapping, "A", 1, "R");
     expect(rotor.forwardsRelativeOffset).toEqual(0);
