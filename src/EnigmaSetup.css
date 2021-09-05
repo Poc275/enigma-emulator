@@ -1,0 +1,9 @@
+#status {
+    padding: 10px;
+    position: fixed;
+    right: 20px;
+    top: 150px;
+    background-color: antiquewhite;
+    width: 20%;
+    line-height: 1.5;
+}

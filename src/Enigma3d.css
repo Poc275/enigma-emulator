@@ -1,0 +1,19 @@
+/* remove full viewport margins */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* move the canvas to the top left corner to remove the scrollbars */
+.webgl {
+    position: fixed;    /* can use absolute too */
+    top: 0;
+    left: 0;
+    outline: none;      /* some browsers will have a blue outline when dragging the object */
+}
+
+/* on a mac trackpad you can scroll the page slightly showing some overflow */
+html,
+body {
+    overflow: hidden;
+}
