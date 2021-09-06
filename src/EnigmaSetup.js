@@ -158,8 +158,6 @@ function EnigmaSetup(props) {
 
     const start = () => {
         // lock-in the enigma settings
-        props.setupCallback();
-
         document.getElementById("reflector-select").disabled = true;
         setDisableSettings(true);
 
@@ -171,6 +169,9 @@ function EnigmaSetup(props) {
 
         const enigma = new Enigma(new Plugboard(), new EntryRotor(), rhsRotor, midRotor, lhsRotor, reflector);
         setEngima(enigma);
+
+        // call the setup callback so we can begin a new message
+        props.setupCallback();
     };
 
     return (

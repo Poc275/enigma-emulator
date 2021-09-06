@@ -183,6 +183,8 @@ function Enigma3d() {
                 const keyClicked = currentIntersect.object.name.split('_')[1];
                 console.log(keyClicked);
                 setKeyPress(keyClicked);
+                // reset key press to null otherwise the same letter repeated will not get caught
+                setKeyPress(null);
             }
         };
         // window.addEventListener('click', (event) => {
