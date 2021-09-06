@@ -158,7 +158,6 @@ function EnigmaSetup(props) {
 
     const start = () => {
         // lock-in the enigma settings
-        document.getElementById("reflector-select").disabled = true;
         setDisableSettings(true);
 
         const selectedReflector = document.getElementById("reflector-select").value;
@@ -179,10 +178,11 @@ function EnigmaSetup(props) {
             <div>
                 <h1>Enigma Emulator</h1>
                 <p>Setup the Enigma machine and click Start to begin your message. Click on the keys to type your message.</p>
+                <br />
 
                 <p>
                     <label htmlFor="reflector-select">1. Choose a reflector: </label>
-                    <select name="reflector" id="reflector-select" defaultValue={"B"}>
+                    <select name="reflector" id="reflector-select" defaultValue={"B"} disabled={disableSettings}>
                         <option value="A">Reflector A</option>
                         <option value="B">Reflector B</option>
                     </select>
@@ -209,7 +209,7 @@ function EnigmaSetup(props) {
                     <RingSettingSelect defaultValue={rhsRotorRingSetting} onChange={(event) => rotorRingSettingChange(event, "rhs")} disabled={disableSettings} />
                 </p>
 
-                <button id="start" onClick={start}>5. Start!</button>
+                <button id="start" onClick={start} disabled={disableSettings}>5. Start!</button>
             </div>
 
             <div>
@@ -222,8 +222,8 @@ function EnigmaSetup(props) {
                 <textarea id="output" name="output" rows="10" cols="35" disabled></textarea>
             </div>
 
-            <p>Enigma model courtesy of <a href="https://sketchfab.com/3d-models/enigma-machine-1934-c8ee76c383654e3095ea4cc9e7990274">Enigma machine, 
-                1934 by the Science Museum Group</a> licenced under CC BY-NC-SA 4.0.</p>
+            <small>Enigma model courtesy of <a href="https://sketchfab.com/3d-models/enigma-machine-1934-c8ee76c383654e3095ea4cc9e7990274">Enigma machine, 
+                1934 by the Science Museum Group</a> licenced under CC BY-NC-SA 4.0.</small>
         </div>
     )
 }

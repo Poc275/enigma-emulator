@@ -1,9 +1,14 @@
 #status {
     padding: 10px;
     position: fixed;
-    right: 20px;
-    top: 150px;
+    left: 20px;
+    top: 20px;
     background-color: antiquewhite;
     width: 20%;
     line-height: 1.5;
+}
+
+button {
+    margin: 5px 0;
+    padding: 5px;
 }
