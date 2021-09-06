@@ -187,7 +187,12 @@ function EnigmaSetup(props) {
         <div id="status">
             <div>
                 <h1>Enigma Emulator</h1>
-                <p>Setup the Enigma machine and click Start to begin your message. Click on the keys to type your message.</p>
+                <p>Setup the Enigma machine and click Start to begin your message. Click on the keys to type. See 
+                  this <a href="http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages">wiki</a> for some example 
+                  messages (<a href="http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Decrypts">decrypted versions available here</a>). Note 
+                  this emulates a 3-rotor Enigma I/M3 machine.
+                </p>
+
                 <br />
 
                 <p>
@@ -233,17 +238,17 @@ function EnigmaSetup(props) {
                   <input type="text" id="plugboard-10" name="plugboard-10" minLength="2" maxLength="2" size="2" disabled={disableSettings} className="plugboard-input"></input>
                 </p>
 
-                <button id="start" onClick={start} disabled={disableSettings}>5. Start!</button>
+                <button id="start" onClick={start} disabled={disableSettings}>6. Start!</button>
             </div>
 
             <div>
               <p>Message</p>
-              <textarea id="input" name="input" rows="10" cols="35" disabled></textarea>
+              <textarea id="input" name="input" rows="8" cols="45" disabled></textarea>
             </div>
 
             <div>
               <p>Output</p>
-              <textarea id="output" name="output" rows="10" cols="35" disabled></textarea>
+              <textarea id="output" name="output" rows="8" cols="45" disabled></textarea>
             </div>
 
             <small>Enigma model courtesy of <a href="https://sketchfab.com/3d-models/enigma-machine-1934-c8ee76c383654e3095ea4cc9e7990274">Enigma machine, 
