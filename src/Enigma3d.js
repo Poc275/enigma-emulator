@@ -131,6 +131,9 @@ function Enigma3d() {
         gltfLoader.load(
             '/enigma_separated.glb',
             (gltf) => {
+                // remove progress bar
+                document.getElementById("progress").remove();
+
                 // console.log(gltf.scene.children[0]);
                 const model = gltf.scene.children[0];
                 scene.add(model);
@@ -141,16 +144,12 @@ function Enigma3d() {
                         keyObjects.push(child);
                     }
                 });
-
-                // console.log(keyObjects);
-
-                // add position tweaks
-                // gui.add(model.position, 'x').min(-50).max(50).step(1).name('xPos');
-                // gui.add(model.position, 'y').min(-50).max(50).step(1).name('yPos');
-                // gui.add(model.position, 'z').min(-50).max(50).step(1).name('zPos');
             },
             // progress handler
             (progress) => {
+                const modelSize = 20707000;
+                const percentage = progress.loaded / modelSize * 100;
+                document.getElementById("progress").innerHTML = `Loading model: ${percentage.toFixed(0)}%`;
                 console.log("Loading model", progress);
             },
             // error handler
@@ -158,31 +157,6 @@ function Enigma3d() {
                 console.log("Error loading model", error);
             }
         );
-
-        // keyboard model test
-        // gltfLoader.load(
-        //     '/test_keyboard/keyboard.glb',
-        //     (gltf) => {
-        //         console.log(gltf);
-        //         scene.add(gltf.scene);
-
-        //         // collect key objects for interaction later
-        //         const children = [...gltf.scene.children];
-        //         for(const child of children) {
-        //              keyObjects.push(child);
-        //         }
-
-        //         console.log(keyObjects);
-        //     },
-        //     // progress handler
-        //     (progress) => {
-        //         console.log("Loading model", progress);
-        //     },
-        //     // error handler
-        //     (error) => {
-        //         console.log("Error loading model", error);
-        //     }
-        // );
 
         /**
          * Raycaster
@@ -217,13 +191,6 @@ function Enigma3d() {
                 setKeyPress(null);
             }
         };
-        // window.addEventListener('click', (event) => {
-        //     if(currentIntersect) {
-        //         // key objects are named key_X so split to get the character
-        //         const keyClicked = currentIntersect.object.name.split('_')[1];
-        //         console.log(keyClicked);
-        //     }
-        // });
 
         // Controls
         const controls = new OrbitControls(camera, canvas)
@@ -298,6 +265,7 @@ function Enigma3d() {
     return (
         <>
             <canvas className="webgl"></canvas>
+            <p id="progress"></p>
             <EnigmaSetup setupCallback={enigmaSetupComplete} keyPress={keyPress} />
         </>
     )
