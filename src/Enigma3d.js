@@ -28,6 +28,11 @@ function Enigma3d() {
         // Debug UI
         const gui = new dat.GUI();
 
+        // object to hold custom properties that we want to tweak
+        const parameters = {
+            pointLightColour: 0xffffff
+        };
+
         // Loaders
         const gltfLoader = new GLTFLoader();
         const dracoLoader = new DRACOLoader();
@@ -81,13 +86,38 @@ function Enigma3d() {
         scene.add(ambientLight);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-        directionalLight.position.set(5, 5, 5);
+        directionalLight.position.set(20, 25, 20);
         scene.add(directionalLight);
 
-        gui.add(directionalLight, 'intensity').min(0).max(5).step(0.01).name('lightIntensity');
-        gui.add(directionalLight.position, 'x').min(-50).max(50).step(1).name('lightXPos');
-        gui.add(directionalLight.position, 'y').min(-50).max(50).step(1).name('lightYPos');
-        gui.add(directionalLight.position, 'z').min(-50).max(50).step(1).name('lightZPos');
+        // directional light tweaks
+        const directionalLightTweaks = gui.addFolder('Directional Light');
+        directionalLightTweaks.add(directionalLight, 'intensity').min(0).max(5).step(0.01).name('lightIntensity');
+        directionalLightTweaks.add(directionalLight.position, 'x').min(-50).max(50).step(1).name('lightXPos');
+        directionalLightTweaks.add(directionalLight.position, 'y').min(-50).max(50).step(1).name('lightYPos');
+        directionalLightTweaks.add(directionalLight.position, 'z').min(-50).max(50).step(1).name('lightZPos');
+
+        // light helper
+        // const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.5);
+        // scene.add(directionalLightHelper);
+
+        const pointLight = new THREE.PointLight(parameters.pointLightColour, 1.5, 30, 0);
+        scene.add(pointLight);
+        pointLight.position.set(-15, 10, 25);
+        pointLight.lookAt(new THREE.Vector3(0, 0, 0));
+        
+        // point light tweaks
+        const pointLightTweaks = gui.addFolder('Point Light');
+        pointLightTweaks.add(pointLight, 'intensity').min(0).max(5).step(0.01).name('lightIntensity');
+        pointLightTweaks.add(pointLight.position, 'x').min(-50).max(50).step(0.1).name('lightXPos');
+        pointLightTweaks.add(pointLight.position, 'y').min(-50).max(50).step(0.1).name('lightYPos');
+        pointLightTweaks.add(pointLight.position, 'z').min(-50).max(50).step(0.1).name('lightZPos');
+        pointLightTweaks.addColor(parameters, 'pointLightColour').onChange(() => {
+            pointLight.color.set(parameters.pointLightColour);
+        });
+
+        // light helper
+        // const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.5);
+        // scene.add(pointLightHelper);
 
         // Camera
         const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
