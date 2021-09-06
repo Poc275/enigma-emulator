@@ -12,3 +12,7 @@ button {
     margin: 5px 0;
     padding: 5px;
 }
+
+.plugboard-input {
+    margin: 0 3px;
+}
