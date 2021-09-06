@@ -71,8 +71,8 @@ function Enigma3d() {
 
         // add an axes helper to help position objects
         // red is x-axis, green is y-axis and blue is z-axis
-        const axesHelper = new THREE.AxesHelper(5);
-        scene.add(axesHelper);
+        // const axesHelper = new THREE.AxesHelper(5);
+        // scene.add(axesHelper);
 
         /**
          * Lights
